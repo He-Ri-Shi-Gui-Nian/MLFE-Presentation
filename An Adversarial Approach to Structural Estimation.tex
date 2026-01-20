@@ -23,9 +23,9 @@
 \newcommand{\argmin}{\operatorname*{arg\,min}}
 \newcommand{\argmax}{\operatorname*{arg\,max}}
 
-\title[Adversarial Structural Estimation]{An Adversarial Approach\\to Structural Estimation}
+\title[Adversarial Structural Estimation]{An Adversarial Approach to Structural Estimation}
 \subtitle{Kaji, Manresa, Pouliot (Econometrica, 2023)}
-\author{Yuncong Luan}
+\author{***}
 \institute{Graduate School of Economics,\\The University of Tokyo}
 \date{\today}
 
@@ -41,102 +41,6 @@
   \titlepage
   \vspace{-2mm}
   \small
-  \begin{center}
-    \href{https://doi.org/10.3982/ECTA18707}{doi:10.3982/ECTA18707}
-  \end{center}
-\end{frame}
-
-\begin{frame}{Outline}
-  \tableofcontents
-\end{frame}
-
-\section{1. Introduction}
-
-\begin{frame}{Why This Paper? (From the Introduction)}
-  \begin{itemize}
-    \item Structural models are naturally parametric $\Rightarrow$ MLE is attractive, but the likelihood may be intractable.
-    \item Simulation-based estimation (e.g., SMM) can work, but ``stacking many moments'' can hurt finite-sample performance.
-    \item Goal: a simulation-based criterion that is flexible like SMM, but can be as informative as likelihood-based methods.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Core Idea (Abstract)}
-  \begin{itemize}
-    \item Formulate estimation as a minimax problem between:
-    \begin{itemize}
-      \item generator: simulates data from the structural model for a given $\theta$,
-      \item discriminator: tries to classify ``real'' vs ``simulated'' observations.
-    \end{itemize}
-    \item With a sufficiently rich\footnote{[placeholder]} discriminator:
-    \begin{itemize}
-      \item parametric efficiency\footnote{[placeholder]} under correct specification,
-      \item parametric rate\footnote{[placeholder]} under misspecification.
-    \end{itemize}
-    \item Advocate neural networks as discriminators (adaptivity, fast rates).
-  \end{itemize}
-\end{frame}
-
-\section{2. Adversarial Estimation Framework}
-
-\begin{frame}{Setup (Section 2)}
-  \begin{itemize}
-    \item Data: $X_1,\dots,X_n \overset{i.i.d.}{\sim} P_0$ (unknown).
-    \item Structural model: $\{P_\theta : \theta \in \Theta\}$ with intractable likelihood but feasible simulation.
-    \item Simulation: draw shocks $Z_1,\dots,Z_m \sim P_Z$ and map $X_i^\theta = T_\theta(Z_i)$.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Discrimination and Loss}
-  Discriminator $D:\mathcal{X}\to[0,1]$ predicts ``real'' probability\footnote{The probability that $X_i$ is real.}.
-  \vspace{1mm}
-  \[
-    M_{n,m}(\theta, D)
-    :=
-    \frac{1}{n}\sum_{i=1}^{n}\log D(X_i)
-    +\frac{1}{m}\sum_{i=1}^{m}\log\bigl(1-D(X_i^\theta)\bigr).
-  \]
-  \begin{itemize}
-    \item Inner maximization over $D$ improves classification accuracy.
-    \item Outer minimization over $\theta$ makes simulated data hard to distinguish.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Adversarial Estimator}
-  \[
-    \widehat{\theta}
-    :=
-    \argmin_{\theta \in \Theta}\; \max_{D \in \mathcal{D}_n} M_{n,m}(\theta, D).
-  \]
-  \begin{itemize}
-    \item Inner value lies between $2\log(1/2)$\footnote{If $p_0(x)$ and $p_\theta(x)$ overlaps, best the discriminator can do is to flip a coin.} and $0$ (paper discussion).
-    \item Closer to $2\log(1/2)$ $\Rightarrow$ discriminator cannot tell real from simulated.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Oracle Discriminator (Goodfellow et al., 2014)}
-  If $\mathcal{D}_n$ is unrestricted, the population-optimal discriminator is
-  \[
-    D_\theta(x)=\frac{p_0(x)}{p_0(x)+p_\theta(x)},
-  \]
-  where $p_0$ and $p_\theta$ are densities of $P_0$ and $P_\theta$ (w.r.t. a common dominating measure).
-  \vspace{1mm}
-  \begin{itemize}
-    \item Under correct specification, $\theta_0$ uniquely minimizes the population criterion.
-    \item In practice, approximate $D_\theta$ using a sieve of discriminators that can represent oracle $D_\theta$ asymptotically, for example, the sieve of neural networks or the
-sieve of logistic discriminators with an increasing number of polynomials of X.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Computation (Algorithmic Skeleton)}
-  Alternating updates (minimax optimization):
-  \begin{enumerate}
-    \item Given $\theta^{(k)}$, train discriminator parameters (Adam) to (approximately) maximize $M_{n,m}$.
-    \item Given trained $D^{(k)}$, update $\theta$ by standard gradient descent with a simple adaptive learning to decrease $M_{n,m}(\theta, D^{(k)})$.
-    \item Stop when $\theta$ stabilizes and the loss is bounded away from $0$\footnote{Loss function: $M_{n,m}(\theta, D)$. Being bounded away from 0 means that the discriminator cannot tell true and simulated data apart perfectly.} (paper’s practical rule of thumb).
-  \end{enumerate}
-  \vspace{1mm}
-  \small
-  [placeholder: early stopping, regularization, etc.]
 \end{frame}
 
 \section{3. Illustration With Simple Examples}
@@ -151,7 +55,7 @@ sieve of logistic discriminators with an increasing number of polynomials of X.
     \end{itemize}
     \item 3.2 Roy model (two occupations, two periods):
     \begin{itemize}
-      \item full estimation + inference when likelihood is intractable.
+      \item implementation when likelihood is intractable
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -161,120 +65,139 @@ sieve of logistic discriminators with an increasing number of polynomials of X.
 \begin{frame}{3.1 Logistic Location Model (Setup)}
   \begin{itemize}
     \item Data: $X_i \sim \text{Logistic}(0,1)$.
-    \item Model: $X_i \sim \text{Logistic}(\theta,1)$ (location shift, variance known).
+    \item Oracle discriminator: 
+    $$D_\theta(x)=\frac{p_0(x)}{p_0(x)+p_\theta(x)}=\Lambda\left(-\theta-2\log(1+e^{-x})+2\log(1+e^{-(x-\theta)})\right)$$
+    where $\Lambda(x)=1/(1+e^{-x})$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{3.1.1 Correct Specification}
+  \begin{itemize}
+    \item Structural model: $X_i \sim \text{Logistic}(\theta,1)$ (location shift, variance known).
     \item Simulation: $X_i^\theta = \theta + Z_i$ with $Z_i \sim \text{Logistic}(0,1)$.
-    \item Paper sets $n=m=300$.
+    \item $n=m=300$
+    \item Logistic discriminator is correctly specified in the sense that, with the right $\lambda$, it is the oracle discriminator.
+    \begin{figure}[htbp]
+      \centering
+      \includegraphics[width=0.7\textwidth]{figure 1.png}
+    \end{figure}
+    when $m=2n$, SE becomes 1.82
   \end{itemize}
 \end{frame}
 
-\begin{frame}{3.1 Key Takeaway: Curvature \texorpdfstring{$\approx$}{≈} Likelihood Curvature}
+\begin{frame}{3.1.1 Correct Specification (Cont.)}
   \begin{itemize}
-    \item Define (paper notation) negative half log-likelihood $L_\theta := -\frac{1}{2n}\sum_{i=1}^n \log p_\theta(X_i)$.
-    \item The oracle adversarial loss $M_\theta(D_\theta)$ has curvature linked to Fisher information.
-    \item Estimated loss $M_\theta(\widehat{D}_\theta)$ tracks oracle curvature well when the discriminator is rich enough.
+    \item Paper also shows how a shallow NN discriminator behaves
+    \begin{figure}[htbp]
+      \centering
+      \includegraphics[width=0.7\textwidth]{figure 2.png}
+    \end{figure}
+    \begin{itemize}
+      \item Curvature matters but level doesn't.
+    \end{itemize}
+    \item Paper tried bootstrap with both discriminators
+    \begin{itemize}
+      \item hold fixed the specification of the discriminator
+      \item bootstrap SE is close to the asymptotic SD
+    \end{itemize}
+
   \end{itemize}
-  \vspace{2mm}
-  \begin{center}
-    \fbox{\parbox{0.9\linewidth}{\centering TODO: Insert Figure 1/2 from the paper (logistic model curvature, SEs).}}
-  \end{center}
 \end{frame}
 
-\begin{frame}{3.1 Practical Notes (From the Paper’s Experiments)}
+\begin{frame}{3.1.2 Misspecification}
   \begin{itemize}
-    \item Increasing simulation size $m$ moves adversarial estimator closer to MLE (curvature becomes sharper).
-    \item A shallow neural network discriminator can approximate the oracle well (curvature matters more than level).
-    \item Bootstrap is examined as a practical inference tool.
+    \item The structural model is misspecified as a normal location family with unit variance,
+\[
+p_\theta(x)=\frac{1}{\sqrt{2\pi}}\exp\!\left(-\frac{(x-\theta)^2}{2}\right),
+\]
+    \item Logistic discriminator is correctly specified.
+    \begin{figure}[htbp]
+      \centering
+      \includegraphics[width=0.7\textwidth]{figure 3.png}
+    \end{figure}
+    \item Results with larger $m$ and with NN discriminator are similar to Sec.\ 3.1.1
   \end{itemize}
 \end{frame}
 
+\begin{frame}{3.1 Comparison with SMM}
+  \begin{itemize}
+    \item Logistic discriminator
+\[
+D(x;\lambda)
+= \Lambda\!\left(\lambda_0 + \lambda_1 x + \cdots + \lambda_d x^d\right),
+\quad d = 3, 7, 11,\quad \lambda \in \mathbb{R}^{1+d}.
+\]
+    \begin{figure}
+      \centering
+      \includegraphics[width=0.7\textwidth]{figure 4.png}
+    \end{figure}
+  \end{itemize}
+  
+\end{frame}
 
+
+\begin{frame}{3.1 Comparison with SMM (Cont.)}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{figure 5.png}
+  \end{figure}  
+\end{frame}
 
 
 \subsection{3.2 The Roy Model}
 
-\begin{frame}{3.2 The Roy Model (What It Illustrates)}
-  \begin{itemize}
-    \item Dynamic choice with two occupations over two time periods.
-    \item Likelihood intractable $\Rightarrow$ adversarial estimation + bootstrap inference demonstration.
-    \item Emphasis: the discriminator can use raw inputs (e.g., log wages and choices) rather than hand-picked high-order moments.
-  \end{itemize}
-  \vspace{2mm}
-  \begin{center}
-    \fbox{\parbox{0.9\linewidth}{\centering TODO: Insert Figures 6--9 from the paper (loss plots, estimator locations, bootstrap).}}
-  \end{center}
+
+\begin{frame}{3.2 The Roy Model: Setup and Observables}
+\begin{itemize}
+  \item Economic environment
+\begin{itemize}
+  \item Two sectors $s\in\{1,2\}$ and two periods $t\in\{1,2\}$.
+  \item In each period, the agent chooses a sector to maximize current and discounted future expected wages.
+\end{itemize}
+  \item Wage equations
+\begin{align*}
+\log w_{i1s} &= \mu_s + \varepsilon_{i1s}, \\
+\log w_{i2s} &= \mu_s + \gamma_s \mathbf{1}\{d_{i1}=s\} + \varepsilon_{i2s},
+\end{align*}
+where $\mu_s$ is the base wage and $\gamma_s$ captures returns to sector-specific experience.
+  \item Information and shocks
+\begin{itemize}
+  \item Shocks $(\varepsilon_{i11},\varepsilon_{i12},\varepsilon_{i21},\varepsilon_{i22})$ are observed by the agent when decisions are made.
+  \item They follow a mean-zero multivariate normal distribution with sector and time correlations $(\rho_s,\rho_t)$.
+\end{itemize}
+\end{itemize}
 \end{frame}
 
-\section{4. Statistical Properties}
+\begin{frame}{3.2 The Roy Model: Setup and Observables (Cont.)}
+\begin{itemize}
+  \item Choice rules
+\begin{align*}
+d_{i1} &= \arg\max_{s\in\{1,2\}} \; w_{i1s} + \beta \mathbb{E}[w_{i2}\mid d_{i1}=s], \\
+d_{i2} &= \arg\max_{s\in\{1,2\}} \; w_{i2s},
+\end{align*}
+with discount factor $\beta=0.9$
+  \item Observed data
+\[
+X_i = (\log w_{i1}, d_{i1}, \log w_{i2}, d_{i2}),
+\]
+  \item parameters
+\[
+\theta = (\mu_1, \mu_2, \gamma_1, \gamma_2, \sigma_1, \sigma_2, \rho_t, \rho_s).
+\]
+\end{itemize}
 
-\begin{frame}{Objects for Theory (Section 4)}
-  \begin{itemize}
-    \item Population criterion (paper notation):
-    \[
-      M_\theta(D) := P_0[\log D(X)] + P_\theta[\log(1-D(X))].
-    \]
-    \item Sample version replaces $P_0$ and $P_\theta$ by empirical averages from $\{X_i\}$ and $\{X_i^\theta\}$.
-    \item Key message: good asymptotics require (i) uniform convergence and (ii) discriminator richness (sieve/NN).
-  \end{itemize}
 \end{frame}
 
-\begin{frame}{4.1 Consistency (Theorem 1, High Level)}
+\begin{frame}{3.2.2  Case with Intractable Likelihood}
   \begin{itemize}
-    \item If the oracle loss separates $\theta_0$ from other values (global identification),
-    \item and the discriminator class is Glivenko--Cantelli so $\widehat{M}_\theta(\widehat{D}_\theta)$ converges uniformly to $M_\theta(D_\theta)$,
-    \item then $\widehat{\theta}\to\theta_0$ (in the paper’s distance metric).
+    \item Bootstrap: resample $\{X_i\}_{i=1}^n$ and $\{Z_i\}_{i=1}^m$
+    \item Neural network estimator is comparable to the logistic estimator
+    \item SMM estimator is less accurate
+    \begin{figure}
+      \centering
+      \includegraphics[width=0.7\textwidth]{Table I.png}
+    \end{figure}
   \end{itemize}
-\end{frame}
-
-\begin{frame}{4.2 Rates and 4.3 Asymptotic Distribution (High Level)}
-  \begin{itemize}
-    \item Under parametric generator assumptions, obtain a rate for $\widehat{\theta}$ driven by:
-    \begin{itemize}
-      \item sampling noise ($n$),
-      \item simulation noise ($m$),
-      \item approximation/estimation error of the discriminator.
-    \end{itemize}
-    \item Asymptotic normality (Theorem 3) with an efficiency corollary under correct specification (Corollary 4).
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{4.4 If the Discriminator Is Not Rich Enough}
-  \begin{itemize}
-    \item Finite-sample discriminators may be ``too small'' $\Rightarrow$ objective corresponds to a projection induced by $\mathcal{D}$.
-    \item Enriching the network class (more layers/nodes) improves approximation to the oracle discriminator.
-    \item Practical implication: architecture/tuning matter because they control the effective set of features/moments.
-  \end{itemize}
-\end{frame}
-
-\section{5. Conclusion}
-
-\begin{frame}{Takeaways}
-  \begin{itemize}
-    \item Adversarial estimation: a simulation-based estimator defined by a minimax classification problem.
-    \item With rich discriminators, the method can be as informative as likelihood-based estimation, without requiring tractable likelihood.
-    \item Empirically (paper): works in a logistic location example and a Roy model, with bootstrap-based inference.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{References (Minimal)}
-  \footnotesize
-  \begin{thebibliography}{9}
-    \bibitem{kaji2023}
-      T. Kaji, E. Manresa, and G. Pouliot.
-      \newblock \emph{An Adversarial Approach to Structural Estimation}.
-      \newblock Econometrica, 91(6):2041--2063, 2023.
-    \bibitem{goodfellow2014}
-      I. Goodfellow, J. Pouget-Abadie, M. Mirza, et al.
-      \newblock \emph{Generative Adversarial Nets}.
-      \newblock NeurIPS, 2014.
-    \bibitem{altonjisegal1996}
-      J. Altonji and L. Segal.
-      \newblock \emph{Small-Sample Bias in GMM Estimation of Covariance Structures}.
-      \newblock Journal of Business \& Economic Statistics, 1996.
-    \bibitem{pakespollard1989}
-      A. Pakes and D. Pollard.
-      \newblock \emph{Simulation and the Asymptotics of Optimization Estimators}.
-      \newblock Econometrica, 1989.
-  \end{thebibliography}
 \end{frame}
 
 \end{document}
